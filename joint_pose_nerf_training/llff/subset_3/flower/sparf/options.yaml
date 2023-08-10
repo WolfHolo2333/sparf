@@ -1,0 +1,168 @@
+apply_cf_pe: true
+arch:
+    density_activ: softplus
+    layers_feat:
+    - null
+    - 256
+    - 256
+    - 256
+    - 256
+    - 256
+    - 256
+    - 256
+    - 256
+    layers_feat_fine: null
+    layers_rgb:
+    - null
+    - 128
+    - 3
+    posenc:
+        L_3D: 10
+        L_view: 4
+        add_raw_3D_points: true
+        add_raw_rays: true
+        include_pi_in_posenc: true
+        log_sampling: true
+    skip:
+    - 4
+    tf_init: true
+barf_c2f:
+- 0.4
+- 0.7
+camera:
+    initial_pose: identity
+    model: perspective
+    n_first_fixed_poses: 0
+    ndc: false
+    noise: null
+    optimize_c2w: false
+    optimize_relative_poses: false
+    optimize_rot: true
+    optimize_trans: true
+    pose_parametrization: two_columns
+clip_by_norm: true
+copy_data: false
+corres_weight_reduct_at_x_iter: 10000
+crop_ratio: null
+cudnn_benchmark: true
+data_root: /home/jupyter/shared
+dataset: llff
+debug: false
+depth_cons_loss_reduct_at_x_iter: 10000
+depth_regu_patch_size: 2
+diff_loss_type: huber
+distributed: false
+do_eval: true
+filter_corr_w_cc: false
+first_joint_pose_nerf_then_nerf: true
+flow_backbone: PDCNet
+flow_batch_size: 5
+flow_ckpt_path: /data/zhangyichi/zhangyichi/nhaplus/sparf/models/PDCNet_megadepth.pth.tar
+grad_acc_steps: 1
+gradually_decrease_corres_weight: false
+gradually_decrease_depth_cons_loss: false
+huber_loss_for_photometric: true
+increase_depth_range_by_x_percent: 0.2
+iter_start_decrease_corres_weight: 0
+llff_img_factor: 8
+load_colmap_depth: false
+log_steps: 100
+loss_type: photometric_and_corres_and_depth_cons
+loss_weight:
+    corres: -3.0
+    depth_cons: -3.0
+    depth_patch: null
+    distortion: null
+    equalize_losses: false
+    fg_mask: null
+    parametrization: exp
+    render: 0.0
+    render_matches: null
+mask_img: false
+matching_pair_generation: all_to_all
+max_iter: 100000
+min_conf_cc_valid_corr: 0.4
+min_conf_valid_corr: 0.95
+min_nbr_matches: 500
+model: joint_pose_nerf_training
+module_name: joint_pose_nerf_training/llff/subset_3/flower
+module_name_for_eval: joint_pose_nerf_training/llff
+nerf:
+    density_noise_reg: false
+    depth:
+        param: inverse
+        range:
+        - 1
+        - 0
+    fine_sampling: false
+    rand_rays: 2048
+    sample_intvs: 128
+    sample_intvs_fine: 128
+    sample_stratified: true
+    setbg_opaque: false
+    view_dep: true
+nerf_gradient_clipping: 0.1
+num_workers: 8
+optim:
+    algo_pose: Adam
+    lr: 0.001
+    lr_end: 0.0001
+    lr_pose: 0.003
+    lr_pose_end: 1.0e-05
+    sched:
+        gamma: null
+        type: ExponentialLR
+    sched_pose:
+        gamma: null
+        type: ExponentialLR
+    start_decrease: 0
+    test_iter: 100
+    test_photo: true
+    warmup_pose: null
+    weight_decay: 0.0001
+pairing_angle_threshold: 45
+plot: false
+pose_gradient_clipping: null
+precrop_frac: 0.5
+precrop_iters: 0
+preload: false
+preload_images: false
+project_path: joint_pose_nerf_training/llff/subset_3/flower/sparf
+ratio_end_joint_nerf_pose_refinement: 0.3
+ratio_start_decrease_corres_weight: null
+render_video_only: false
+render_video_pose_only: false
+renderrepro_depth_reprojection_thresh: 0.1
+renderrepro_do_depth_reprojection_check: false
+renderrepro_do_pixel_reprojection_check: false
+renderrepro_pixel_reprojection_thresh: 20.0
+resize: null
+restart_nerf: false
+sample_fraction_in_fg_mask: 0.0
+sampled_fraction_in_center: 0.0
+save_ind_files: false
+scene: flower
+script_name: sparf
+seed: 0
+snapshot_steps: 5000
+start_iter:
+    corres: 1000
+    depth_cons: 1000
+    photometric: 0
+start_ratio:
+    corres: null
+    depth_cons: null
+    photometric: null
+stop_corres_loss_at: null
+test_metrics_only: false
+train_module: joint_pose_nerf_training/llff
+train_name: sparf
+train_sub: 3
+use_flow: true
+use_gpu: true
+use_homography_flow: false
+use_wandb: false
+val_on_test: false
+val_steps: 5000
+val_sub: null
+vis_steps: 1000
