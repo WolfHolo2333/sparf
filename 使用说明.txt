@@ -1,0 +1,19 @@
+安装：
+pip install -r requirements.txt
+cd third_party\Hierarchical-Localization\third_party\disk
+pip install -r requirements.txt
+（主要安装主目录下的requirements.txt和其中一个第三方库中的requirements.txt）
+
+模型下载：
+下载：https://drive.google.com/file/d/1nOpC0MFWNV8N6ue0csed4I2K_ffX64BL/view
+并设置train_settings/default_config.py中的flow_ckpt_path路径指向该模型
+
+数据集位置及路径设置：
+主目录下新建data文件夹 解压至该文件夹下 路径为data/set0/bmvs_bear data/set0/scan_24（示例）
+并需要设置source/damin/local.py文件下的 dtu dtu_mask路径为数据集路径 如self.dtu = '/data/zhangyichi/zhangyichi/nhaplus/sparf/data/set0'（示例）
+
+训练命令命令见run_trainval_set0_work1.sh
+输出位姿命令见run_trainval_set0_eval1.sh
+
+位姿输出完毕应存储于主目录下的workspace_test/joint_pose_nerf_training/dtu/subset_3/scene_name/poses下
+把这个文件夹下的npy文件发我 我再搜集其他主机上跑完的在本地转成traj格式
