@@ -613,12 +613,12 @@ class NerfTrainerPerScene(base.PerSceneTrainer):
         N_list=[128]
         axis_range_list=[1.2,2.4,3.6,4.8,6.0]
         iso_level_list=[32,64,128,256]
-        # sigma_threshold_list=[25.,50.,75.,100.]
+        sigma_threshold_list=[1.,5.,10.,25.,50.,75.,100.]
 
         for N in N_list:
             for axis_range in axis_range_list:
-                for iso_level in iso_level_list:
-                # for sigma_threshold in sigma_threshold_list:
+                # for iso_level in iso_level_list:
+                for sigma_threshold in sigma_threshold_list:
                     opt.output_path = '{}/{}'.format(self._base_save_dir, self.settings.project_path)
                     self.net.eval()
 
@@ -628,11 +628,11 @@ class NerfTrainerPerScene(base.PerSceneTrainer):
                     ret = self.net.render_cube_at_specific_pose_and_rays(opt, mode='val', iter=None,N=N,axis_range=axis_range)
                     sigma=ret["sigma"]
 
-                    sigma_threshold=self.extract_iso_level(sigma,iso_level)
+                    # sigma_threshold=self.extract_iso_level(sigma,iso_level)
 
                     vertices, triangles = mcubes.marching_cubes(sigma, sigma_threshold)
                     mesh = trimesh.Trimesh(vertices / N, triangles)
 
-                    trimesh.exchange.export.export_mesh(mesh, "{}/model_N{}_axis_range{}_iso_level{}.obj".format(mesh_path,N,axis_range,iso_level))
+                    trimesh.exchange.export.export_mesh(mesh, "{}/model_N{}_axis_range{}_sigma_threshold{}.obj".format(mesh_path,N,axis_range,sigma_threshold))
 
         return
