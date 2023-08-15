@@ -172,16 +172,24 @@ class NeRF(torch.nn.Module):
     def forward_cube_samples(self, opt: Dict[str, Any], points_3D_samples: torch.Tensor, ray: torch.Tensor,
                         embedder_pts: Callable[[Dict[str, Any], torch.Tensor, int], torch.Tensor],
                         embedder_view: Callable[[Dict[str, Any], torch.Tensor, int], torch.Tensor],
-                        mode: str = None) -> Dict[str, Any]:
+                        mode: str = None,chunk=1024*32) -> Dict[str, Any]:
         points_3D_samples=points_3D_samples.unsqueeze(1).unsqueeze(0)
         ray=ray.unsqueeze(0)
-        print("!!!","points_3D_samples",points_3D_samples.shape)
-        print("!!!","ray",ray.shape)
 
-        pred_dict = self.forward(opt, points_3D_samples=points_3D_samples,
-                                 ray=ray, embedder_pts=embedder_pts,
-                                 embedder_view=embedder_view, mode=mode)  # [B,HW,N],[B,HW,N,3]
-        return pred_dict
+        nums=points_3D_samples.shape[1]
+        out_chunks=[]
+
+        for i in range(0,nums,chunk):
+            pred_dict = self.forward(opt, points_3D_samples=points_3D_samples[:,i:i+chunk,:,:],
+                                    ray=ray[:,i:i+chunk,:], embedder_pts=embedder_pts,
+                                    embedder_view=embedder_view, mode=mode)  # [B,HW,N],[B,HW,N,3]
+            density_samples=pred_dict["density_samples"].cpu()
+
+            out_chunks += [density_samples]
+
+        sigma=torch.cat(out_chunks,1)
+
+        return sigma
 
     def forward(self, opt: Dict[str, Any], points_3D_samples: torch.Tensor, ray: torch.Tensor, 
                 embedder_pts: Callable[[Dict[str, Any], torch.Tensor, int], torch.Tensor],
