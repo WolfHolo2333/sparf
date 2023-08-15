@@ -258,7 +258,7 @@ class Graph(torch.nn.Module):
             torch.arange(start=0, end=batch_size).to(self.device) 
         return ret
 
-    def render_cube(self, opt: Dict[str, Any],iter: int = None, mode: int = None, N: int = 128, axis_range: float = 1.2) -> Dict[str, Any]:
+    def render_cube(self, opt: Dict[str, Any],iter: int = None, mode: int = None, N: int = 512, axis_range: float = 1.2) -> Dict[str, Any]:
         pred={}
 
         xmin, xmax = -axis_range, axis_range  # left/right range
@@ -288,19 +288,14 @@ class Graph(torch.nn.Module):
                                                          embedder_pts=self.embedder_pts,
                                                          embedder_view=self.embedder_view, mode=mode)
 
+        pred_out=None
         if pred_fine is not None:
-            rgb_samples=pred_fine["rgb_samples"]
-            density_samples=pred_fine["density_samples"]
+            pred_out=pred_fine
         else:
-            rgb_samples=pred_coarse["rgb_samples"]
-            density_samples=pred_coarse["density_samples"]
-        print("!!!","rgb_samples",rgb_samples.shape)
-        print("!!!","density_samples",density_samples.shape)
+            pred_out=pred_coarse
 
-        sigma = density_samples.cpu().numpy()
+        sigma = pred_out.numpy()
         sigma = np.maximum(sigma, 0)
-
-        print("!!!","sigma",sigma.shape,"min:",np.min(sigma),"max:",np.max(sigma))
 
         sigma = sigma.reshape(N, N, N)
         pred["sigma"]=sigma
