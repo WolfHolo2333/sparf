@@ -380,14 +380,15 @@ class DTUDatasetPixelNerf(Dataset):
         pose_indices = [int(os.path.basename(e)[:-4]) for e in rgb_files] # this way is safer than range
 
         camera_info = np.load(os.path.join(scene_path, "cameras_sphere.npz"))
+        camera_aligned_info = np.load(os.path.join(scene_path, "sfm_aslfeat_n6000r1440_superglue", "cameras_sfm_aligned.npz"))
 
-        camera_noise_path = os.path.join(scene_path, "noises0.15.pt")
-        assert os.path.exists(camera_noise_path)
-        se3_noise = torch.load(camera_noise_path)
+        # camera_noise_path = os.path.join(scene_path, "noises0.15.pt")
+        # assert os.path.exists(camera_noise_path)
+        # se3_noise = torch.load(camera_noise_path)
 
         intrinsics = []
         poses_c2w = []
-        poses_c2w_noise = []
+        poses_c2w_aligned = []
 
         for p in pose_indices:
             world_mat = camera_info[f"world_mat_{p}"] # Projection matrix 
@@ -395,25 +396,32 @@ class DTUDatasetPixelNerf(Dataset):
 
             P = world_mat @ scale_mat
             P = P[:3,:4]
-            intrinsics_,pose_ = self.load_K_Rt_from_P(P)
+            intrinsics_, pose_ = self.load_K_Rt_from_P(P)
 
-            w2c = self.invert_pose(pose_)
-            pose_base = self.pose(R=w2c[:3,:3], t=w2c[:3,3])
+            world_aligned_mat = camera_aligned_info[f"world_mat_{p}"] # Projection matrix 
+            scale_aligned_mat = camera_aligned_info.get(f"scale_mat_{p}")
 
-            w2c_noisy = self.pose.compose([self.lie.se3_to_SE3(se3_noise[p]), pose_base])
-            w2c_noisy = torch.cat([w2c_noisy, torch.tensor([0,0,0,1], dtype=torch.float32, device=w2c.device).view(1,4)], -2).cpu().numpy()
+            P = world_aligned_mat @ scale_aligned_mat
+            P = P[:3,:4]
+            _, c2w_aligned = self.load_K_Rt_from_P(P)
 
-            c2w_noisy = self.invert_pose(w2c_noisy)
+            # w2c = self.invert_pose(pose_)
+            # pose_base = self.pose(R=w2c[:3,:3], t=w2c[:3,3])
+
+            # w2c_noisy = self.pose.compose([self.lie.se3_to_SE3(se3_noise[p]), pose_base])
+            # w2c_noisy = torch.cat([w2c_noisy, torch.tensor([0,0,0,1], dtype=torch.float32, device=w2c.device).view(1,4)], -2).cpu().numpy()
+
+            # c2w_noisy = self.invert_pose(w2c_noisy)
 
             poses_c2w.append(pose_)
-            poses_c2w_noise.append(c2w_noisy)
+            poses_c2w_aligned.append(c2w_aligned)
             intrinsics.append(intrinsics_)
 
         intrinsics = np.stack(intrinsics, axis=0)
         poses_c2w = np.stack(poses_c2w, axis=0)
-        poses_c2w_noise = np.stack(poses_c2w_noise, axis=0)
+        poses_c2w_aligned = np.stack(poses_c2w_aligned, axis=0)
 
-        return file_names, rgb_files, intrinsics, poses_c2w, poses_c2w_noise
+        return file_names, rgb_files, intrinsics, poses_c2w, poses_c2w_aligned
 
     def _load_mask_paths(self, scene: str, train_idx: List[int], test_idx: List[int]):
         """Load masks from disk."""
