@@ -59,7 +59,7 @@ def define_trainer(args: Dict[str, Any], settings_model: Dict[str, Any],
             if settings_model.train_sub == 2:
                 settings_model.max_iter = 60000
             elif settings_model.train_sub == 3:
-                settings_model.max_iter = 100000
+                settings_model.max_iter = 20000
                 # settings_model.max_iter = 10000
             elif settings_model.train_sub == 6:
                 settings_model.max_iter = 150000
