@@ -45,3 +45,5 @@ python run_trainval.py joint_pose_nerf_training/dtu sparf --train_sub 3 --scene 
 
 python run_trainval.py joint_pose_nerf_training/dtu sparf --train_sub 3 --scene scan122 --save_pose_only True
 python run_trainval.py joint_pose_nerf_training/dtu sparf --train_sub 3 --scene scan122 --extract_mesh_only True
+
+python eval_result_process.py
